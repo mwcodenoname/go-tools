@@ -1,4 +1,4 @@
-module xlib.org/go-tools
+module github.com/mwcodenoname/go-tools
 
 go 1.22
 
