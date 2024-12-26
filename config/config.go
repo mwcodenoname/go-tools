@@ -10,17 +10,31 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var AppConfig map[string]string
+var AppConfig map[string]interface{}
 
 func init() {
-	AppConfig = make(map[string]string)
+	AppConfig = make(map[string]interface{})
 	ReadFromYAMLFile("config.yaml")
 }
 
 func GetConfig(key string) string {
-	return AppConfig[key]
+	keys := strings.Split(key, ".")
+	var current interface{} = AppConfig
+	for _, k := range keys {
+		switch m := current.(type) {
+		case map[interface{}]interface{}:
+			current = m[k]
+		case map[string]interface{}:
+			current = m[k]
+		default:
+			return ""
+		}
+	}
+	if current != nil {
+		return fmt.Sprintf("%v", current)
+	}
+	return ""
 }
-
 func ReadFromYAMLFile(filename string) {
 	workdir := os.Getenv("XCONFIG_WORKDIR")
 	fmt.Println("XCONFIG_WORKDIR:" + workdir)
